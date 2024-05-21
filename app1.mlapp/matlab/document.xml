@@ -1,0 +1,884 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no" ?><w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body><w:p><w:pPr><w:pStyle w:val="code"/></w:pPr><w:r><w:t><![CDATA[classdef app1 < matlab.apps.AppBase
+
+    % Properties that correspond to app components
+    properties (Access = public)
+        UIFigure                     matlab.ui.Figure
+        Menu                         matlab.ui.container.Menu
+        SelectStopBitsMenu           matlab.ui.container.Menu
+        Menu_21                      matlab.ui.container.Menu
+        Menu_22                      matlab.ui.container.Menu
+        Menu_23                      matlab.ui.container.Menu
+        SelectDataBitsMenu           matlab.ui.container.Menu
+        Menu_17                      matlab.ui.container.Menu
+        Menu_18                      matlab.ui.container.Menu
+        Menu_19                      matlab.ui.container.Menu
+        Menu_20                      matlab.ui.container.Menu
+        SelectParityMenu             matlab.ui.container.Menu
+        NoneMenu                     matlab.ui.container.Menu
+        EvenMenu                     matlab.ui.container.Menu
+        OddMenu                      matlab.ui.container.Menu
+        SelectBaudrateMenu           matlab.ui.container.Menu
+        Menu_2                       matlab.ui.container.Menu
+        Menu_3                       matlab.ui.container.Menu
+        Menu_4                       matlab.ui.container.Menu
+        Menu_5                       matlab.ui.container.Menu
+        Menu_6                       matlab.ui.container.Menu
+        Menu_7                       matlab.ui.container.Menu
+        Menu_8                       matlab.ui.container.Menu
+        Menu_9                       matlab.ui.container.Menu
+        Menu_10                      matlab.ui.container.Menu
+        Menu_11                      matlab.ui.container.Menu
+        Menu_12                      matlab.ui.container.Menu
+        Menu_13                      matlab.ui.container.Menu
+        Menu_14                      matlab.ui.container.Menu
+        Menu_15                      matlab.ui.container.Menu
+        Menu_16                      matlab.ui.container.Menu
+        SelectTerminalMenu           matlab.ui.container.Menu
+        CRMenu                       matlab.ui.container.Menu
+        LFMenu                       matlab.ui.container.Menu
+        CRLFMenu                     matlab.ui.container.Menu
+        AutosetButton                matlab.ui.control.Button
+        QuickStartButton             matlab.ui.control.Button
+        StartSerialCOMButton_2       matlab.ui.control.Button
+        SaveButton                   matlab.ui.control.Button
+        StartEditField_2             matlab.ui.control.NumericEditField
+        StartEditField_2Label        matlab.ui.control.Label
+        StopSerialCOMButton          matlab.ui.control.Button
+        CH6CheckBox                  matlab.ui.control.CheckBox
+        CH5CheckBox                  matlab.ui.control.CheckBox
+        CH4CheckBox                  matlab.ui.control.CheckBox
+        EndEditField                 matlab.ui.control.EditField
+        EndEditFieldLabel            matlab.ui.control.Label
+        LiveLamp                     matlab.ui.control.Lamp
+        LiveLampLabel                matlab.ui.control.Label
+        PlotintervalButton           matlab.ui.control.Button
+        AcquisitiontimeKnob          matlab.ui.control.Knob
+        AcquisitiontimeKnobLabel     matlab.ui.control.Label
+        VoltageKnob                  matlab.ui.control.Knob
+        VoltageKnobLabel             matlab.ui.control.Label
+        ReadfileButton               matlab.ui.control.Button
+        StartEditField               matlab.ui.control.NumericEditField
+        StartEditFieldLabel          matlab.ui.control.Label
+        LivewaveformplotSwitch       matlab.ui.control.Switch
+        LivewaveformplotSwitchLabel  matlab.ui.control.Label
+        CH3CheckBox                  matlab.ui.control.CheckBox
+        CH2CheckBox                  matlab.ui.control.CheckBox
+        CH1CheckBox                  matlab.ui.control.CheckBox
+        UIAxes                       matlab.ui.control.UIAxes
+    end
+
+    
+    properties (Access = public)
+        
+        s
+        value1
+        value2
+        value3
+        value4
+        value5
+        value6
+        matr
+        matr1
+        voltageChangingValue
+        timeChangingValue
+        startTextValue
+        stopTextValue
+        PlotIntervalValue
+        autoSet
+    end
+    
+
+    % Callbacks that handle component events
+    methods (Access = private)
+
+        % Value changed function: LivewaveformplotSwitch
+        function LivewaveformplotSwitchValueChanged(app, event)
+            value = app.LivewaveformplotSwitch.Value;
+            
+            
+            switch value
+                case 'On'
+                    app.LiveLamp.Color = 'green';
+                    
+                    i = 1;
+                    app.matr = zeros(1,7);
+                    app.matr1 = zeros(1,7);
+                    
+                    Plotgraph=plot(app.UIAxes,app.matr(:,1),app.matr(:,2));
+                    t(i) = 0;
+                    tic
+                    
+                    while ishandle(app.UIAxes)
+                        
+                        string = readline(app.s);
+                        string=convertStringsToChars(string);
+                        %   string = read(s,50,'char')
+                        if(length(string)~=1)
+                            a =split(string,[" ",'/t']);
+                            j = 1;
+                            v = zeros(1,7);
+                            for k=1:length(a)
+                                %if(~isempty(a{k}))
+                                if(~isnan(str2double(a{k})))
+                                    %           z = a{k};
+                                    %           z = split(z,'-');
+                                    %           v(j) = str2double(z);
+                                    %        end
+                                    v(j) = str2double(a{k});
+                                    j = j+1;
+%                                 else
+%                                     v = v(1,1:1:length(v)-1);
+                                end
+                                
+                            end
+                            x = v;
+                            
+                            if(size(x,2)==7)
+                                app.matr = [app.matr;x]
+                            end
+                            
+                        end
+                        
+                        i = i + 1;
+                        t(i) = toc;
+                        minlen(i) = min(length(t), length(app.matr));
+                        
+                        
+                        
+                        if app.value1 == 1
+                            Plotgraph1 = Plotgraph;
+                            set(Plotgraph1,'XData',t(1:minlen(i)),'YData',app.matr(1:minlen(i),1))
+                            %hold on
+                            %grid(app.UIAxes)
+                            legend(app.UIAxes,'Time comparison')
+                            drawnow
+                            pause(0.0004)
+                            
+                        elseif app.value2 == 1
+                            Plotgraph2 = Plotgraph;
+                            set(Plotgraph2,'XData',t(1:minlen(i)),'YData',app.matr(:,2))
+                            %hold on
+                            %grid(app.UIAxes)
+                            legend(app.UIAxes,'Roll Angular Velocity - Ox Axis')
+                            drawnow
+                            pause(0.0004)
+                            
+                            
+                        elseif app.value3 == 1
+                            Plotgraph3 = Plotgraph;
+                            set(Plotgraph3,'XData',t(1:minlen(i)),'YData',app.matr(:,3))
+                            %hold on
+                            %grid(app.UIAxes)
+                            legend(app.UIAxes,'Pitch Angular Velocity - Oy Axis')
+                            drawnow
+                            pause(0.0004)
+                            
+                        elseif app.value4 == 1
+                            Plotgraph4 = Plotgraph;
+                            set(Plotgraph4,'XData',t(1:minlen(i)),'YData',app.matr(:,4))
+                            %hold on
+                            %grid(app.UIAxes)
+                            legend(app.UIAxes,'Yaw Angular Velocity - Oz Axis')
+                            drawnow
+                            pause(0.0004)
+                            
+                        elseif app.value5 == 1
+                            Plotgraph5= Plotgraph;
+                            set(Plotgraph5,'XData',t(1:minlen(i)),'YData',app.matr(:,5))
+                            %hold on
+                            %grid(app.UIAXes)
+                            legend(app.UIAxes,'Roll Position - Ox Axis')
+                            drawnow
+                            pause(0.0004)
+                            
+                        elseif app.value6 == 1
+                            Plotgraph6 = Plotgraph;
+                            set(Plotgraph6,'XData',t(1:minlen(i)),'YData',app.matr(:,6))
+                            %hold on
+                            %grid(app.UIAxes)
+                            legend(app.UIAxes,'Pitch Position - Oy Axis')
+                            drawnow
+                            pause(0.0004)
+                            
+                        end
+                        
+                        if app.voltageChangingValue == 1
+                            app.matr(:,2) = app.matr(:,2);
+                            app.matr(:,3) = app.matr(:,3);
+                            app.matr(:,4) = app.matr(:,4);
+                            app.matr(:,5) = app.matr(:,5);
+                            app.matr(:,6) = app.matr(:,6);
+                        end
+                        
+                        if app.voltageChangingValue == 10
+                            app.matr(:,2) = 0.1*app.matr(:,2);
+                            app.matr(:,3) = 0.1*app.matr(:,3);
+                            app.matr(:,4) = 0.1*app.matr(:,4);
+                            app.matr(:,5) = 0.1*app.matr(:,5);
+                            app.matr(:,6) = 0.1*app.matr(:,6);
+                        end
+                        
+                        if app.voltageChangingValue == 20
+                            app.matr(:,2) = 0.2*app.matr(:,2);
+                            app.matr(:,3) = 0.2*app.matr(:,3);
+                            app.matr(:,4) = 0.2*app.matr(:,4);
+                            app.matr(:,5) = 0.2*app.matr(:,5);
+                            app.matr(:,6) = 0.2*app.matr(:,6);
+                        end
+                        
+                        if app.voltageChangingValue == 30
+                            app.matr(:,2) = 0.3*app.matr(:,2);
+                            app.matr(:,3) = 0.3*app.matr(:,3);
+                            app.matr(:,4) = 0.3*app.matr(:,4);
+                            app.matr(:,5) = 0.3*app.matr(:,5);
+                            app.matr(:,6) = 0.3*app.matr(:,6);
+                        end
+                        
+                        if app.voltageChangingValue == 40
+                            app.matr(:,2) = 0.4*app.matr(:,2);
+                            app.matr(:,3) = 0.4*app.matr(:,3);
+                            app.matr(:,4) = 0.4*app.matr(:,4);
+                            app.matr(:,5) = 0.4*app.matr(:,5);
+                            app.matr(:,6) = 0.4*app.matr(:,6);
+                        end
+                        
+                        if app.voltageChangingValue == 50
+                            app.matr(:,2) = 0.5*app.matr(:,2);
+                            app.matr(:,3) = 0.5*app.matr(:,3);
+                            app.matr(:,4) = 0.5*app.matr(:,4);
+                            app.matr(:,5) = 0.5*app.matr(:,5);
+                            app.matr(:,6) = 0.5*app.matr(:,6);
+                        end
+                        
+                        if app.voltageChangingValue == 60
+                            app.matr(:,2) = 0.6*app.matr(:,2);
+                            app.matr(:,3) = 0.6*app.matr(:,3);
+                            app.matr(:,4) = 0.6*app.matr(:,4);
+                            app.matr(:,5) = 0.6*app.matr(:,5);
+                            app.matr(:,6) = 0.6*app.matr(:,6);
+                        end
+                        
+                        if app.voltageChangingValue == 70
+                            app.matr(:,2) = 0.7*app.matr(:,2);
+                            app.matr(:,3) = 0.7*app.matr(:,3);
+                            app.matr(:,4) = 0.7*app.matr(:,4);
+                            app.matr(:,5) = 0.7*app.matr(:,5);
+                            app.matr(:,6) = 0.7*app.matr(:,6);
+                        end
+                        
+                        if app.voltageChangingValue == 80
+                            app.matr(:,2) = 0.8*app.matr(:,2);
+                            app.matr(:,3) = 0.8*app.matr(:,3);
+                            app.matr(:,4) = 0.8*app.matr(:,4);
+                            app.matr(:,5) = 0.8*app.matr(:,5);
+                            app.matr(:,6) = 0.8*app.matr(:,6);
+                        end
+                        
+                        if app.voltageChangingValue == 90
+                            app.matr(:,2) = 0.9*app.matr(:,2);
+                            app.matr(:,3) = 0.9*app.matr(:,3);
+                            app.matr(:,4) = 0.9*app.matr(:,4);
+                            app.matr(:,5) = 0.9*app.matr(:,5);
+                            app.matr(:,6) = 0.9*app.matr(:,6);
+                        end
+                        
+                        if app.timeChangingValue == 1
+                            app.matr(:,1) = 0.1*app.matr(:,1);
+                        end
+                        
+                        if app.timeChangingValue == 0.2
+                            app.matr(:,1) = 0.2*app.matr(:,1);
+                        end
+                        
+                        if app.timeChangingValue == 0.3
+                            app.matr(:,1) = 0.3*app.matr(:,1);
+                        end
+                        
+                        if app.timeChangingValue == 0.4
+                            app.matr(:,1) = 0.1*app.matr(:,1);
+                        end
+                        
+                        if app.timeChangingValue == 0.5
+                            app.matr(:,1) = 0.5*app.matr(:,1);
+                        end
+                        
+                        if app.timeChangingValue == 0.6
+                            app.matr(:,1) = 0.6*app.matr(:,1);
+                        end
+                        
+                        if app.timeChangingValue == 0.7
+                            app.matr(:,1) = 0.7*app.matr(:,1);
+                        end
+                        
+                        if app.timeChangingValue == 0.8
+                            app.matr(:,1) = 0.8*app.matr(:,1);
+                        end
+                        
+                        if app.timeChangingValue == 0.9
+                            app.matr(:,1) = 0.9*app.matr(:,1);
+                        end
+                        
+                        if app.timeChangingValue == 0.1
+                            app.matr(:,1) = app.matr(:,1);
+                        end
+                        
+                        app.matr1 = app.matr;
+                    end
+                    
+                case 'Off'
+                    app.LiveLamp.Color = 'red';
+                    delete(app.s)
+                otherwise
+                    app.LiveLampColor = 'red';
+            end
+            
+            
+        end
+
+        % Callback function
+        function StopSerialCOMButtonPushed(app, event)
+            clear
+        end
+
+        % Callback function: Menu_12, StopSerialCOMButton
+        function StartSerialCOMButtonValueChanged(app, event)
+            delete(app.s)
+            clear
+         
+        end
+
+        % Button pushed function: SaveButton
+        function SaveButtonPushed(app, event)
+            %app.matr = app.matr(app.startTextValue:app.stopTextValue,:);
+            writematrix(app.matr,'matrice.csv')
+        end
+
+        % Callback function
+        function StartSerialCOMButtonPushed(app, event)
+            
+        end
+
+        % Menu selected function: Menu_11
+        function Menu_11Selected(app, event)
+            app.s.BaudRate = 115200;
+        end
+
+        % Callback function
+        function COM5MenuSelected(app, event)
+            
+        end
+
+        % Menu selected function: LFMenu
+        function LFMenuSelected(app, event)
+            configureTerminator(app.s,"LF");
+        end
+
+        % Value changed function: CH1CheckBox
+        function CH1CheckBoxValueChanged(app, event)
+            app.value1 = app.CH1CheckBox.Value;
+        end
+
+        % Value changed function: CH2CheckBox
+        function CH2CheckBoxValueChanged(app, event)
+            app.value2 = app.CH2CheckBox.Value;
+            
+        end
+
+        % Value changed function: CH3CheckBox
+        function CH3CheckBoxValueChanged(app, event)
+            app.value3 = app.CH3CheckBox.Value;
+            
+        end
+
+        % Value changed function: CH4CheckBox
+        function CH4CheckBoxValueChanged(app, event)
+            app.value4 = app.CH4CheckBox.Value;
+            
+        end
+
+        % Value changed function: CH5CheckBox
+        function CH5CheckBoxValueChanged(app, event)
+            app.value5 = app.CH5CheckBox.Value;
+            
+        end
+
+        % Value changed function: CH6CheckBox
+        function CH6CheckBoxValueChanged(app, event)
+            app.value6 = app.CH6CheckBox.Value;
+            
+        end
+
+        % Menu selected function: NoneMenu
+        function NoneMenuSelected(app, event)
+            set(app.s,'Parity','none');
+        end
+
+        % Menu selected function: Menu_20
+        function Menu_20Selected(app, event)
+            set(app.s,'DataBits',8);
+        end
+
+        % Menu selected function: Menu_21
+        function Menu_21Selected(app, event)
+            set(app.s,'StopBit',1);
+        end
+
+        % Button pushed function: StartSerialCOMButton_2
+        function StartSerialCOMButton_2Pushed(app, event)
+            app.s = serialport("COM6",115200);
+        end
+
+        % Button pushed function: ReadfileButton
+        function ReadfileButtonPushed(app, event)
+            readmatrix('matrice.csv')
+        end
+
+        % Value changing function: VoltageKnob
+        function VoltageKnobValueChanging(app, event)
+            
+            
+        end
+
+        % Value changed function: VoltageKnob
+        function VoltageKnobValueChanged(app, event)
+            app.voltageChangingValue = app.VoltageKnob.Value;
+            
+        end
+
+        % Value changed function: AcquisitiontimeKnob
+        function AcquisitiontimeKnobValueChanged(app, event)
+            app.timeChangingValue = app.AcquisitiontimeKnob.Value;
+            
+        end
+
+        % Value changed function: StartEditField
+        function StartEditFieldValueChanged(app, event)
+            app.startTextValue = app.StartEditField.Value;
+            app.startTextValue = str2double(app.startTextValue);
+            
+        end
+
+        % Value changed function: EndEditField
+        function EndEditFieldValueChanged(app, event)
+            app.stopTextValue = app.EndEditField.Value;
+            app.stopTextValue = str2double(app.stopTextValue);
+            
+        end
+
+        % Value changed function: StartEditField_2
+        function StartEditField_2ValueChanged(app, event)
+            app.PlotIntervalValue = app.StartEditField_2.Value;
+            app.PlotIntervalValue = str2double(app.PlotIntervalValue);
+        end
+
+        % Button pushed function: PlotintervalButton
+        function PlotintervalButtonPushed(app, event)
+            app.matr = app.matr(app.PlotIntervalValue:end,:);
+        end
+
+        % Button pushed function: QuickStartButton
+        function QuickStartButtonPushed(app, event)
+            app.s = serialport("COM6",9600);
+            %app.s.BaudRate = 115200;
+            
+            set(app.s,'Parity','none');
+            set(app.s,'DataBits',8);
+            set(app.s,'StopBit',1);
+            configureTerminator(app.s,"LF");
+            
+        end
+
+        % Button pushed function: AutosetButton
+        function AutosetButtonPushed(app, event)
+           app.autoSet = sgolayfilt(app.matr(:,:),3,15);
+           app.matr = app.autoSet;
+        end
+    end
+
+    % Component initialization
+    methods (Access = private)
+
+        % Create UIFigure and components
+        function createComponents(app)
+
+            % Create UIFigure and hide until all components are created
+            app.UIFigure = uifigure('Visible', 'off');
+            app.UIFigure.Position = [100 100 893 759];
+            app.UIFigure.Name = 'MATLAB App';
+
+            % Create Menu
+            app.Menu = uimenu(app.UIFigure);
+            app.Menu.Text = 'Menu';
+
+            % Create SelectStopBitsMenu
+            app.SelectStopBitsMenu = uimenu(app.Menu);
+            app.SelectStopBitsMenu.Text = 'Select StopBits';
+
+            % Create Menu_21
+            app.Menu_21 = uimenu(app.SelectStopBitsMenu);
+            app.Menu_21.MenuSelectedFcn = createCallbackFcn(app, @Menu_21Selected, true);
+            app.Menu_21.Text = '1';
+
+            % Create Menu_22
+            app.Menu_22 = uimenu(app.SelectStopBitsMenu);
+            app.Menu_22.Text = '1.5';
+
+            % Create Menu_23
+            app.Menu_23 = uimenu(app.SelectStopBitsMenu);
+            app.Menu_23.Text = '2';
+
+            % Create SelectDataBitsMenu
+            app.SelectDataBitsMenu = uimenu(app.Menu);
+            app.SelectDataBitsMenu.Text = 'Select DataBits';
+
+            % Create Menu_17
+            app.Menu_17 = uimenu(app.SelectDataBitsMenu);
+            app.Menu_17.Text = '5';
+
+            % Create Menu_18
+            app.Menu_18 = uimenu(app.SelectDataBitsMenu);
+            app.Menu_18.Text = '6';
+
+            % Create Menu_19
+            app.Menu_19 = uimenu(app.SelectDataBitsMenu);
+            app.Menu_19.Text = '7';
+
+            % Create Menu_20
+            app.Menu_20 = uimenu(app.SelectDataBitsMenu);
+            app.Menu_20.MenuSelectedFcn = createCallbackFcn(app, @Menu_20Selected, true);
+            app.Menu_20.Text = '8';
+
+            % Create SelectParityMenu
+            app.SelectParityMenu = uimenu(app.Menu);
+            app.SelectParityMenu.Text = 'Select Parity';
+
+            % Create NoneMenu
+            app.NoneMenu = uimenu(app.SelectParityMenu);
+            app.NoneMenu.MenuSelectedFcn = createCallbackFcn(app, @NoneMenuSelected, true);
+            app.NoneMenu.Text = 'None';
+
+            % Create EvenMenu
+            app.EvenMenu = uimenu(app.SelectParityMenu);
+            app.EvenMenu.Text = 'Even';
+
+            % Create OddMenu
+            app.OddMenu = uimenu(app.SelectParityMenu);
+            app.OddMenu.Text = 'Odd';
+
+            % Create SelectBaudrateMenu
+            app.SelectBaudrateMenu = uimenu(app.Menu);
+            app.SelectBaudrateMenu.Text = 'Select Baudrate';
+
+            % Create Menu_2
+            app.Menu_2 = uimenu(app.SelectBaudrateMenu);
+            app.Menu_2.Text = '300';
+
+            % Create Menu_3
+            app.Menu_3 = uimenu(app.SelectBaudrateMenu);
+            app.Menu_3.Text = '1200';
+
+            % Create Menu_4
+            app.Menu_4 = uimenu(app.SelectBaudrateMenu);
+            app.Menu_4.Text = '2400';
+
+            % Create Menu_5
+            app.Menu_5 = uimenu(app.SelectBaudrateMenu);
+            app.Menu_5.Text = '4800';
+
+            % Create Menu_6
+            app.Menu_6 = uimenu(app.SelectBaudrateMenu);
+            app.Menu_6.Text = '9600';
+
+            % Create Menu_7
+            app.Menu_7 = uimenu(app.SelectBaudrateMenu);
+            app.Menu_7.Text = '19200';
+
+            % Create Menu_8
+            app.Menu_8 = uimenu(app.SelectBaudrateMenu);
+            app.Menu_8.Text = '38400';
+
+            % Create Menu_9
+            app.Menu_9 = uimenu(app.SelectBaudrateMenu);
+            app.Menu_9.Text = '57600';
+
+            % Create Menu_10
+            app.Menu_10 = uimenu(app.SelectBaudrateMenu);
+            app.Menu_10.Text = '74880';
+
+            % Create Menu_11
+            app.Menu_11 = uimenu(app.SelectBaudrateMenu);
+            app.Menu_11.MenuSelectedFcn = createCallbackFcn(app, @Menu_11Selected, true);
+            app.Menu_11.Text = '115200';
+
+            % Create Menu_12
+            app.Menu_12 = uimenu(app.SelectBaudrateMenu);
+            app.Menu_12.MenuSelectedFcn = createCallbackFcn(app, @StartSerialCOMButtonValueChanged, true);
+            app.Menu_12.Text = '230400';
+
+            % Create Menu_13
+            app.Menu_13 = uimenu(app.SelectBaudrateMenu);
+            app.Menu_13.Text = '250000';
+
+            % Create Menu_14
+            app.Menu_14 = uimenu(app.SelectBaudrateMenu);
+            app.Menu_14.Text = '500000';
+
+            % Create Menu_15
+            app.Menu_15 = uimenu(app.SelectBaudrateMenu);
+            app.Menu_15.Text = '1000000';
+
+            % Create Menu_16
+            app.Menu_16 = uimenu(app.SelectBaudrateMenu);
+            app.Menu_16.Text = '2000000';
+
+            % Create SelectTerminalMenu
+            app.SelectTerminalMenu = uimenu(app.Menu);
+            app.SelectTerminalMenu.Text = 'Select Terminal';
+
+            % Create CRMenu
+            app.CRMenu = uimenu(app.SelectTerminalMenu);
+            app.CRMenu.Text = 'CR';
+
+            % Create LFMenu
+            app.LFMenu = uimenu(app.SelectTerminalMenu);
+            app.LFMenu.MenuSelectedFcn = createCallbackFcn(app, @LFMenuSelected, true);
+            app.LFMenu.Text = 'LF';
+
+            % Create CRLFMenu
+            app.CRLFMenu = uimenu(app.SelectTerminalMenu);
+            app.CRLFMenu.Text = 'CR/LF';
+
+            % Create UIAxes
+            app.UIAxes = uiaxes(app.UIFigure);
+            xlabel(app.UIAxes, 'Time')
+            ylabel(app.UIAxes, 'Voltage')
+            app.UIAxes.PlotBoxAspectRatio = [2.22410147991543 1 1];
+            app.UIAxes.Colormap = [];
+            app.UIAxes.XTick = [0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1];
+            app.UIAxes.XTickLabel = {'0'; '0.1'; '0.2'; '0.3'; '0.4'; '0.5'; '0.6'; '0.7'; '0.8'; '0.9'; '1'};
+            app.UIAxes.YTick = [-1 -0.9 -0.8 -0.7 -0.6 -0.5 -0.4 -0.3 -0.2 -0.1 0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1];
+            app.UIAxes.YTickLabel = {'-1'; '-0.8'; '-0.6'; '-0.4'; '-0.2'; '0'; '0.2'; '0.4'; '0.6'; '0.8'; '-1'; '-0.8'; '-0.6'; '-0.4'; '-0.2'; '0'; '0.2'; '0.4'; '0.6'; '0.8'; '1'};
+            app.UIAxes.XGrid = 'on';
+            app.UIAxes.YGrid = 'on';
+            app.UIAxes.Position = [2 328 893 433];
+
+            % Create CH1CheckBox
+            app.CH1CheckBox = uicheckbox(app.UIFigure);
+            app.CH1CheckBox.ValueChangedFcn = createCallbackFcn(app, @CH1CheckBoxValueChanged, true);
+            app.CH1CheckBox.Text = 'CH1';
+            app.CH1CheckBox.FontSize = 16;
+            app.CH1CheckBox.Position = [55 301 54 22];
+
+            % Create CH2CheckBox
+            app.CH2CheckBox = uicheckbox(app.UIFigure);
+            app.CH2CheckBox.ValueChangedFcn = createCallbackFcn(app, @CH2CheckBoxValueChanged, true);
+            app.CH2CheckBox.Text = 'CH2';
+            app.CH2CheckBox.FontSize = 16;
+            app.CH2CheckBox.Position = [115 301 54 22];
+
+            % Create CH3CheckBox
+            app.CH3CheckBox = uicheckbox(app.UIFigure);
+            app.CH3CheckBox.ValueChangedFcn = createCallbackFcn(app, @CH3CheckBoxValueChanged, true);
+            app.CH3CheckBox.Text = 'CH3';
+            app.CH3CheckBox.FontSize = 16;
+            app.CH3CheckBox.Position = [175 301 54 22];
+
+            % Create LivewaveformplotSwitchLabel
+            app.LivewaveformplotSwitchLabel = uilabel(app.UIFigure);
+            app.LivewaveformplotSwitchLabel.HorizontalAlignment = 'center';
+            app.LivewaveformplotSwitchLabel.FontSize = 16;
+            app.LivewaveformplotSwitchLabel.Position = [628 268 139 22];
+            app.LivewaveformplotSwitchLabel.Text = 'Live waveform plot';
+
+            % Create LivewaveformplotSwitch
+            app.LivewaveformplotSwitch = uiswitch(app.UIFigure, 'slider');
+            app.LivewaveformplotSwitch.ValueChangedFcn = createCallbackFcn(app, @LivewaveformplotSwitchValueChanged, true);
+            app.LivewaveformplotSwitch.FontSize = 16;
+            app.LivewaveformplotSwitch.Position = [674 305 47 21];
+
+            % Create StartEditFieldLabel
+            app.StartEditFieldLabel = uilabel(app.UIFigure);
+            app.StartEditFieldLabel.HorizontalAlignment = 'right';
+            app.StartEditFieldLabel.FontSize = 16;
+            app.StartEditFieldLabel.Position = [464 1 48 22];
+            app.StartEditFieldLabel.Text = 'Start: ';
+
+            % Create StartEditField
+            app.StartEditField = uieditfield(app.UIFigure, 'numeric');
+            app.StartEditField.Limits = [0 Inf];
+            app.StartEditField.ValueChangedFcn = createCallbackFcn(app, @StartEditFieldValueChanged, true);
+            app.StartEditField.FontSize = 16;
+            app.StartEditField.Position = [527 1 100 27];
+
+            % Create ReadfileButton
+            app.ReadfileButton = uibutton(app.UIFigure, 'push');
+            app.ReadfileButton.ButtonPushedFcn = createCallbackFcn(app, @ReadfileButtonPushed, true);
+            app.ReadfileButton.FontSize = 16;
+            app.ReadfileButton.Position = [794 72 100 27];
+            app.ReadfileButton.Text = 'Read file';
+
+            % Create VoltageKnobLabel
+            app.VoltageKnobLabel = uilabel(app.UIFigure);
+            app.VoltageKnobLabel.HorizontalAlignment = 'center';
+            app.VoltageKnobLabel.FontSize = 16;
+            app.VoltageKnobLabel.Position = [48 1 59 22];
+            app.VoltageKnobLabel.Text = 'Voltage';
+
+            % Create VoltageKnob
+            app.VoltageKnob = uiknob(app.UIFigure, 'continuous');
+            app.VoltageKnob.Limits = [1 100];
+            app.VoltageKnob.MajorTicks = [1 10 20 30 40 50 60 70 80 90];
+            app.VoltageKnob.ValueChangedFcn = createCallbackFcn(app, @VoltageKnobValueChanged, true);
+            app.VoltageKnob.ValueChangingFcn = createCallbackFcn(app, @VoltageKnobValueChanging, true);
+            app.VoltageKnob.FontSize = 16;
+            app.VoltageKnob.Position = [40 57 74 74];
+            app.VoltageKnob.Value = 1;
+
+            % Create AcquisitiontimeKnobLabel
+            app.AcquisitiontimeKnobLabel = uilabel(app.UIFigure);
+            app.AcquisitiontimeKnobLabel.HorizontalAlignment = 'center';
+            app.AcquisitiontimeKnobLabel.FontSize = 16;
+            app.AcquisitiontimeKnobLabel.Position = [178 1 118 22];
+            app.AcquisitiontimeKnobLabel.Text = 'Acquisition time';
+
+            % Create AcquisitiontimeKnob
+            app.AcquisitiontimeKnob = uiknob(app.UIFigure, 'continuous');
+            app.AcquisitiontimeKnob.Limits = [0.01 1];
+            app.AcquisitiontimeKnob.MajorTicks = [0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1];
+            app.AcquisitiontimeKnob.ValueChangedFcn = createCallbackFcn(app, @AcquisitiontimeKnobValueChanged, true);
+            app.AcquisitiontimeKnob.MinorTicks = [0.01 0.06 0.11 0.16 0.21 0.26 0.31 0.36 0.41 0.46 0.51 0.56 0.61 0.66 0.71 0.76 0.81 0.86 0.91 0.96 1];
+            app.AcquisitiontimeKnob.FontSize = 16;
+            app.AcquisitiontimeKnob.Position = [210 57 74 74];
+            app.AcquisitiontimeKnob.Value = 0.1;
+
+            % Create PlotintervalButton
+            app.PlotintervalButton = uibutton(app.UIFigure, 'push');
+            app.PlotintervalButton.ButtonPushedFcn = createCallbackFcn(app, @PlotintervalButtonPushed, true);
+            app.PlotintervalButton.FontSize = 16;
+            app.PlotintervalButton.Position = [432 263 150 27];
+            app.PlotintervalButton.Text = 'Plot interval';
+
+            % Create LiveLampLabel
+            app.LiveLampLabel = uilabel(app.UIFigure);
+            app.LiveLampLabel.HorizontalAlignment = 'right';
+            app.LiveLampLabel.FontSize = 16;
+            app.LiveLampLabel.Position = [795 304 35 22];
+            app.LiveLampLabel.Text = 'Live';
+
+            % Create LiveLamp
+            app.LiveLamp = uilamp(app.UIFigure);
+            app.LiveLamp.Position = [845 301 28 28];
+            app.LiveLamp.Color = [1 0 0];
+
+            % Create EndEditFieldLabel
+            app.EndEditFieldLabel = uilabel(app.UIFigure);
+            app.EndEditFieldLabel.HorizontalAlignment = 'right';
+            app.EndEditFieldLabel.FontSize = 16;
+            app.EndEditFieldLabel.Position = [630 1 39 22];
+            app.EndEditFieldLabel.Text = 'End:';
+
+            % Create EndEditField
+            app.EndEditField = uieditfield(app.UIFigure, 'text');
+            app.EndEditField.ValueChangedFcn = createCallbackFcn(app, @EndEditFieldValueChanged, true);
+            app.EndEditField.FontSize = 16;
+            app.EndEditField.Position = [684 1 100 27];
+
+            % Create CH4CheckBox
+            app.CH4CheckBox = uicheckbox(app.UIFigure);
+            app.CH4CheckBox.ValueChangedFcn = createCallbackFcn(app, @CH4CheckBoxValueChanged, true);
+            app.CH4CheckBox.Text = 'CH4';
+            app.CH4CheckBox.FontSize = 16;
+            app.CH4CheckBox.Position = [235 301 57 22];
+
+            % Create CH5CheckBox
+            app.CH5CheckBox = uicheckbox(app.UIFigure);
+            app.CH5CheckBox.ValueChangedFcn = createCallbackFcn(app, @CH5CheckBoxValueChanged, true);
+            app.CH5CheckBox.Text = 'CH5';
+            app.CH5CheckBox.FontSize = 16;
+            app.CH5CheckBox.Position = [295 301 55 22];
+
+            % Create CH6CheckBox
+            app.CH6CheckBox = uicheckbox(app.UIFigure);
+            app.CH6CheckBox.ValueChangedFcn = createCallbackFcn(app, @CH6CheckBoxValueChanged, true);
+            app.CH6CheckBox.Text = 'CH6';
+            app.CH6CheckBox.FontSize = 16;
+            app.CH6CheckBox.Position = [355 301 51 22];
+
+            % Create StopSerialCOMButton
+            app.StopSerialCOMButton = uibutton(app.UIFigure, 'push');
+            app.StopSerialCOMButton.ButtonPushedFcn = createCallbackFcn(app, @StartSerialCOMButtonValueChanged, true);
+            app.StopSerialCOMButton.FontSize = 16;
+            app.StopSerialCOMButton.Position = [4 170 132 27];
+            app.StopSerialCOMButton.Text = 'Stop SerialCOM';
+
+            % Create StartEditField_2Label
+            app.StartEditField_2Label = uilabel(app.UIFigure);
+            app.StartEditField_2Label.HorizontalAlignment = 'right';
+            app.StartEditField_2Label.FontSize = 16;
+            app.StartEditField_2Label.Position = [432 302 39 22];
+            app.StartEditField_2Label.Text = 'Start';
+
+            % Create StartEditField_2
+            app.StartEditField_2 = uieditfield(app.UIFigure, 'numeric');
+            app.StartEditField_2.ValueChangedFcn = createCallbackFcn(app, @StartEditField_2ValueChanged, true);
+            app.StartEditField_2.FontSize = 16;
+            app.StartEditField_2.Position = [482 303 100 22];
+
+            % Create SaveButton
+            app.SaveButton = uibutton(app.UIFigure, 'push');
+            app.SaveButton.ButtonPushedFcn = createCallbackFcn(app, @SaveButtonPushed, true);
+            app.SaveButton.FontSize = 16;
+            app.SaveButton.Position = [792 1 100 27];
+            app.SaveButton.Text = 'Save';
+
+            % Create StartSerialCOMButton_2
+            app.StartSerialCOMButton_2 = uibutton(app.UIFigure, 'push');
+            app.StartSerialCOMButton_2.ButtonPushedFcn = createCallbackFcn(app, @StartSerialCOMButton_2Pushed, true);
+            app.StartSerialCOMButton_2.FontSize = 16;
+            app.StartSerialCOMButton_2.Position = [4 215 132 27];
+            app.StartSerialCOMButton_2.Text = 'Start SerialCOM';
+
+            % Create QuickStartButton
+            app.QuickStartButton = uibutton(app.UIFigure, 'push');
+            app.QuickStartButton.ButtonPushedFcn = createCallbackFcn(app, @QuickStartButtonPushed, true);
+            app.QuickStartButton.FontSize = 16;
+            app.QuickStartButton.Position = [4 260 132 27];
+            app.QuickStartButton.Text = 'Quick Start';
+
+            % Create AutosetButton
+            app.AutosetButton = uibutton(app.UIFigure, 'push');
+            app.AutosetButton.ButtonPushedFcn = createCallbackFcn(app, @AutosetButtonPushed, true);
+            app.AutosetButton.FontSize = 16;
+            app.AutosetButton.Position = [193 215 132 27];
+            app.AutosetButton.Text = {'Autoset'; ''};
+
+            % Show the figure after all components are created
+            app.UIFigure.Visible = 'on';
+        end
+    end
+
+    % App creation and deletion
+    methods (Access = public)
+
+        % Construct app
+        function app = app1
+
+            % Create UIFigure and components
+            createComponents(app)
+
+            % Register the app with App Designer
+            registerApp(app, app.UIFigure)
+
+            if nargout == 0
+                clear app
+            end
+        end
+
+        % Code that executes before app deletion
+        function delete(app)
+
+            % Delete UIFigure when app is deleted
+            delete(app.UIFigure)
+        end
+    end
+end]]></w:t></w:r></w:p></w:body></w:document>
